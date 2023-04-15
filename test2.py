@@ -10,7 +10,7 @@ GPIO.setup(relay_pin, GPIO.OUT)
 
 # Turn on the relay for 5 seconds
 GPIO.output(relay_pin, GPIO.HIGH)
-time.sleep(5)
+time.sleep(10)
 
 # Turn off the relay
 GPIO.output(relay_pin, GPIO.LOW)
