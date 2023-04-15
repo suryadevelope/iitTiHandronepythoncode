@@ -1,24 +1,19 @@
-from pymavlink import mavutil
+import RPi.GPIO as GPIO
 import time
-import sys
- # Init connection
-connection_string = '/dev/ttyACM0'
-master = None
-while master is None:
-    try:
-        print("mavlink connecting")
-        master = mavutil.mavlink_connection(connection_string)
-        time.sleep(0.1)
-    except KeyboardInterrupt:
-        print("exit")
-        sys.exit(0)
-    except:
-        pass
-print("Heartbeat from system (system %u component %u)" % (master.target_system, master.target_system)) # <<<< I used system and component IDs to seperate messages from the drone and gimbal.
-# Get the messages
-msg = None
-while not msg:
-    master.mav.request_data_stream_send(0, 0, mavutil.mavlink.MAV_DATA_STREAM_ALL,10,1)# rate = 10, turn on = 1
-    msg = master.recv_match()
-    time.sleep(0.01)
-print(msg)
+
+# Set the GPIO mode and pin number
+GPIO.setmode(GPIO.BCM)
+relay_pin = 18
+
+# Set the GPIO pin as an output
+GPIO.setup(relay_pin, GPIO.OUT)
+
+# Turn on the relay for 5 seconds
+GPIO.output(relay_pin, GPIO.HIGH)
+time.sleep(5)
+
+# Turn off the relay
+GPIO.output(relay_pin, GPIO.LOW)
+
+# Clean up the GPIO pins
+GPIO.cleanup()

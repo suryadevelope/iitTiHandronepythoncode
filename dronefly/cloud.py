@@ -61,6 +61,7 @@ def Cloudint():
     vconnect = db.child("device/"+macaddress+"/vconnect").get().val()
     vrtlmode = db.child("device/"+macaddress+"/rtl").get().val()
     confirm_delivery = db.child("device/"+macaddress+"/confirm_delivery").get().val()
+    returndrone = db.child("device/"+macaddress+"/returndrone").get().val()
 
     if daltitude == None:
         db.child("device/"+macaddress+"/altitude").set("0")
@@ -72,6 +73,8 @@ def Cloudint():
         db.child("device/"+macaddress+"/id").set("null")
         db.child("device/"+macaddress+"/vconnect").set(0)
         db.child("device/"+macaddress+"/rtl").set(0)
+        db.child("device/"+macaddress+"/returndrone").set(0)
+
         dictionary["altitude"] = "0"
         dictionary["dcl"] = "0,0"
         dictionary["ddl"] = "0,0"
@@ -80,6 +83,7 @@ def Cloudint():
         dictionary["id"] = "null"
         dictionary["vconnect"] = 0
         dictionary["confirm_delivery"] = 0
+        dictionary["returndrone"] = 0
         dictionary["rtl"] = 0
         dictionary["Dstatus"] = ["ONLINE",formatted_time_in_utc]
         time.sleep(0.2)
@@ -92,6 +96,7 @@ def Cloudint():
         dictionary["id"] = QRid
         dictionary["vrtl"] = vrtlmode
         dictionary["vconnect"] = vconnect
+        dictionary["returndrone"] = returndrone
         dictionary["confirm_delivery"] = confirm_delivery
         dictionary["Dstatus"] = Dstatus
     print(vconnect)
@@ -110,7 +115,10 @@ def Cloudint():
         dictionary["vrtl"] = 0
     if int(confirm_delivery)==1:
         db.child("device/"+macaddress+"/confirm_delivery").set(0)
+        db.child("device/"+macaddress+"/returndrone").set(0)
         dictionary["confirm_delivery"] = 0
+        dictionary["returndrone"] = 0
+        
 
 
     time.sleep(1)
@@ -144,6 +152,10 @@ def Cloudint():
                 elif message["path"] == "/confirm_delivery":
                     dcon = message["data"]
                     dictionary["confirm_delivery"] = dcon
+                elif message["path"] == "/returndrone":
+                    dreturndrone = message["data"]
+                    dictionary["returndrone"] = dreturndrone
+
                 elif message["path"] == "/drive":
                     ddrive = message["data"]
                     dictionary["drive"] = ddrive

@@ -16,6 +16,14 @@ import shortdist
 import urllib.request
 import time
 
+import RPi.GPIO as GPIO
+
+relay_pin=18
+GPIO.setup(relay_pin,GPIO.OUT)
+
+
+
+
 # def check_internet():
 #     while True:
 #         try:
@@ -126,9 +134,66 @@ def vehicle_goto(lat, long, alt,points,index):
             # Break and return from function just below target altitude.
             if vehicle.location.global_relative_frame.alt <=0.55:
                 cloud.__cloudupload("drive",0)
+                # vehicle.close() 
+                break
+            time.sleep(1)
+
+        # wait for rtl
+        while True:
+            # print("Landing Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
+            # Break and return from function just below target altitude.
+            if int(clouddata["confirm_delivery"])==1:
+                # cloud.__cloudupload("drive",0)
+                # vehicle.close().
+                GPIO.output(relay_pin,GPIO.HIGH)
+                break
+            time.sleep(1)
+
+        time.sleep(2)
+        GPIO.output(relay_pin,GPIO.LOW)
+        while True:
+            # print("Landing Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
+            # Break and return from function just below target altitude.
+            if int(clouddata["returndrone"])==1:
+                print("taking drone back")
+                
+                break
+            time.sleep(1)
+
+        print("Arming motors")
+        # Copter should arm in GUIDED mode
+        vehicle.mode = VehicleMode("GUIDED")
+        vehicle.armed = True
+
+        # Confirm vehicle armed before attempting to take off
+        while not vehicle.armed:
+            print(" Waiting for arming...")
+            time.sleep(1)
+
+        print("Taking off!")
+        vehicle.simple_takeoff(clouddata["altitude"])  # Take off to target altitude
+
+        while True:
+            print(" Altitude: ", vehicle.location.global_relative_frame.alt)
+            # Break and return from function just below target altitude.
+            if vehicle.location.global_relative_frame.alt >= clouddata["altitude"] * 0.95:
+                print("Reached target altitude and rtl ")
+                vehicle.mode = VehicleMode("RTL")
+                break
+            time.sleep(1)
+
+        while True:
+            print("checking Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
+            # Break and return from function just below target altitude.
+            if vehicle.location.global_relative_frame.alt <=0.55:
+                cloud.__cloudupload("drive",0)
+                vehicle.mode = VehicleMode("STABILIZE")
+                vehicle.armed = False
                 vehicle.close() 
                 break
             time.sleep(1)
+        
+
     else:
         point1 = LocationGlobalRelative(float(lat), float(long), 1.5)
         vehicle.simple_goto(point1)
@@ -256,6 +321,7 @@ def __updatefromcloud():  # This function important for cloud onchange
                 clouddata["qrid"] = jsondata["id"]
                 clouddata["vrtl"] = jsondata["vrtl"]
                 clouddata["confirm_delivery"] = jsondata["confirm_delivery"]
+                clouddata["returndrone"] = jsondata["returndrone"]
                 # print(clouddata)
                 # stream.streamfetchdata("cloudqrid",clouddata["qrid"])
             elif int(clouddata["drive"]) == 1:
