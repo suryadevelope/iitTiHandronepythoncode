@@ -18,7 +18,7 @@ import time
 
 import RPi.GPIO as GPIO
 
-relay_pin=18
+relay_pin=21
 GPIO.setup(relay_pin,GPIO.OUT)
 
 
@@ -134,68 +134,66 @@ def vehicle_goto(lat, long, alt,points,index):
             # Break and return from function just below target altitude.
             if vehicle.location.global_relative_frame.alt <=0.55:
                 cloud.__cloudupload("drive",0)
-                
-                
                 vehicle.close() 
                 break
             time.sleep(1)
         vehicle.armed = False
         vehicle.mode = VehicleMode("STABILIZE")
 
-        # # wait for rtl
-        # while True:
-        #     # print("Landing Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
-        #     # Break and return from function just below target altitude.
-        #     if int(clouddata["confirm_delivery"])==1:
-        #         # cloud.__cloudupload("drive",0)
-        #         # vehicle.close().
-        #         GPIO.output(relay_pin,GPIO.HIGH)
-        #         break
-        #     time.sleep(1)
+        # wait for rtl
+        while True:
+            # print("Landing Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
+            # Break and return from function just below target altitude.
+            if int(clouddata["confirm_delivery"])==1:
+                # cloud.__cloudupload("drive",0)
+                # vehicle.close()
+                GPIO.output(relay_pin,GPIO.HIGH)
+                break
+            time.sleep(1)
 
-        # time.sleep(2)
-        # GPIO.output(relay_pin,GPIO.LOW)
-        # while True:
-        #     # print("Landing Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
-        #     # Break and return from function just below target altitude.
-        #     if int(clouddata["returndrone"])==1:
-        #         print("taking drone back")
+        time.sleep(2)
+        GPIO.output(relay_pin,GPIO.LOW)
+        while True:
+            # print("Landing Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
+            # Break and return from function just below target altitude.
+            if int(clouddata["returndrone"])==1:
+                print("taking drone back")
                 
-        #         break
-        #     time.sleep(1)
+                break
+            time.sleep(1)
 
-        # print("Arming motors")
-        # # Copter should arm in GUIDED mode
-        # vehicle.mode = VehicleMode("GUIDED")
-        # vehicle.armed = True
+        print("Arming motors")
+        # Copter should arm in GUIDED mode
+        vehicle.mode = VehicleMode("GUIDED")
+        vehicle.armed = True
 
-        # # Confirm vehicle armed before attempting to take off
-        # while not vehicle.armed:
-        #     print(" Waiting for arming...")
-        #     time.sleep(1)
+        # Confirm vehicle armed before attempting to take off
+        while not vehicle.armed:
+            print(" Waiting for arming...")
+            time.sleep(1)
 
-        # print("Taking off!")
-        # vehicle.simple_takeoff(clouddata["altitude"])  # Take off to target altitude
+        print("Taking off!")
+        vehicle.simple_takeoff(clouddata["altitude"])  # Take off to target altitude
 
-        # while True:
-        #     print(" Altitude: ", vehicle.location.global_relative_frame.alt)
-        #     # Break and return from function just below target altitude.
-        #     if vehicle.location.global_relative_frame.alt >= clouddata["altitude"] * 0.95:
-        #         print("Reached target altitude and rtl ")
-        #         vehicle.mode = VehicleMode("RTL")
-        #         break
-        #     time.sleep(1)
+        while True:
+            print(" Altitude: ", vehicle.location.global_relative_frame.alt)
+            # Break and return from function just below target altitude.
+            if vehicle.location.global_relative_frame.alt >= clouddata["altitude"] * 0.95:
+                print("Reached target altitude and rtl ")
+                vehicle.mode = VehicleMode("RTL")
+                break
+            time.sleep(1)
 
-        # while True:
-        #     print("checking Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
-        #     # Break and return from function just below target altitude.
-        #     if vehicle.location.global_relative_frame.alt <=0.55:
-        #         cloud.__cloudupload("drive",0)
-        #         vehicle.mode = VehicleMode("STABILIZE")
-        #         vehicle.armed = False
-        #         vehicle.close() 
-        #         break
-        #     time.sleep(1)
+        while True:
+            print("checking Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
+            # Break and return from function just below target altitude.
+            if vehicle.location.global_relative_frame.alt <=0.55:
+                cloud.__cloudupload("drive",0)
+                vehicle.mode = VehicleMode("STABILIZE")
+                vehicle.armed = False
+                vehicle.close() 
+                break
+            time.sleep(1)
         
 
     else:
