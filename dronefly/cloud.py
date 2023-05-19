@@ -62,6 +62,7 @@ def Cloudint():
     vrtlmode = db.child("device/"+macaddress+"/rtl").get().val()
     confirm_delivery = db.child("device/"+macaddress+"/confirm_delivery").get().val()
     returndrone = db.child("device/"+macaddress+"/returndrone").get().val()
+    enterotp = db.child("device/"+macaddress+"/enterotp").get().val()
 
     if daltitude == None:
         db.child("device/"+macaddress+"/altitude").set("0")
@@ -74,6 +75,7 @@ def Cloudint():
         db.child("device/"+macaddress+"/vconnect").set(0)
         db.child("device/"+macaddress+"/rtl").set(0)
         db.child("device/"+macaddress+"/returndrone").set(0)
+        db.child("device/"+macaddress+"/enterotp").set(0)
 
         dictionary["altitude"] = "0"
         dictionary["dcl"] = "0,0"
@@ -82,8 +84,8 @@ def Cloudint():
         dictionary["drive"] = 0
         dictionary["id"] = "null"
         dictionary["vconnect"] = 0
-        dictionary["confirm_delivery"] = 0
-        dictionary["returndrone"] = 0
+        dictionary["confirm_delivery"] = "0"
+        dictionary["returndrone"] = "0"
         dictionary["rtl"] = 0
         dictionary["Dstatus"] = ["ONLINE",formatted_time_in_utc]
         time.sleep(0.2)
@@ -100,6 +102,10 @@ def Cloudint():
         dictionary["confirm_delivery"] = confirm_delivery
         dictionary["Dstatus"] = Dstatus
     print(vconnect)
+
+    if(enterotp == 1):
+        db.child("device/"+macaddress+"/enterotp").set("0")
+
     if int(vconnect)==1:
         db.child("device/"+macaddress+"/vconnect").set(0)
         vconnect = 0
@@ -114,10 +120,10 @@ def Cloudint():
         db.child("device/"+macaddress+"/rtl").set(0)
         dictionary["vrtl"] = 0
     if int(confirm_delivery)==1:
-        db.child("device/"+macaddress+"/confirm_delivery").set(0)
-        db.child("device/"+macaddress+"/returndrone").set(0)
-        dictionary["confirm_delivery"] = 0
-        dictionary["returndrone"] = 0
+        db.child("device/"+macaddress+"/confirm_delivery").set("0")
+        db.child("device/"+macaddress+"/returndrone").set("0")
+        dictionary["confirm_delivery"] = "0"
+        dictionary["returndrone"] = "0"
         
 
 
