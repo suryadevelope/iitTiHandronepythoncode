@@ -16,17 +16,19 @@ import shortdist
 import urllib.request
 import time
 
-import RPi.GPIO as GPIO
+from gpiozero import LED
+
+#import RPi.GPIO as GPIO
 
 relay_pin=21
 
 
 rthcords = []
-GPIO.setwarnings(False)
-# Set the GPIO mode and pin number
-GPIO.setmode(GPIO.BCM)
 
-GPIO.setup(relay_pin,GPIO.OUT)
+
+relay = LED(relay_pin)
+
+
 
 
 
@@ -291,12 +293,14 @@ def vehicle_goto(lat, long, alt,points,index,clouddata):
                 # cloud.__cloudupload("drive",0)
                 # vehicle.close()
                 print("otp verified")
-                GPIO.output(relay_pin, GPIO.HIGH)
+                # GPIO.output(relay_pin, GPIO.HIGH)
+                relay.on()
                 break
             time.sleep(1)
 
         time.sleep(2)
-        GPIO.output(relay_pin, GPIO.LOW)
+        # GPIO.output(relay_pin, GPIO.LOW)
+        relay.off()
 
         while True:
             # print("Landing Altitude: ", vehicle.location.global_relative_frame.alt*0.55)
